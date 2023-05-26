@@ -4,9 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def build_frequency_polygon(sample):
-    bins = np.linspace(min(sample), max(sample), num=10)
-    hist, _ = np.histogram(sample, bins=bins)
-
+    hist, bins = np.histogram(sample, bins=10)
     midpoints = (bins[:-1] + bins[1:]) / 2
 
     plt.plot(midpoints, hist, '-o')
