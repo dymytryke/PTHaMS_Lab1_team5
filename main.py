@@ -10,8 +10,9 @@ def build_frequency_polygon(sample):
     midpoints = (bins[:-1] + bins[1:]) / 2
 
     plt.plot(midpoints, hist, '-o')
-    plt.xlabel('Value')
-    plt.ylabel('Frequency')
+    plt.xlabel('Значення')
+    plt.ylabel('Частота')
+    plt.title("Полігон частот вибірки")
     plt.show()
 
 def build_hist(sample):
