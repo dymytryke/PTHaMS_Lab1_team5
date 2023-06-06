@@ -1,3 +1,4 @@
+import scipy
 import scipy.stats as sps
 import numpy as np
 import matplotlib.pyplot as plt
@@ -94,15 +95,39 @@ def build_pie(sample):
     ax.set_title('Кругова діаграма')
     plt.show()
 
-def calculate_and_build_interval(sample):
-    mean = np.mean(sample)
+def get_t(percent,size):
+    return abs(scipy.stats.t.ppf((1 - percent)/2, size - 1))
+
+def calculate_and_build_interval_expectation(sample,percent,size):
+    mean = np.sum(sample) / len(sample)
     n = len(sample)
-    z = 1.96
+    t = get_t(percent,size)
     s = np.sqrt(calculate_varience(sample))
-    low_point = mean - z * (s / np.sqrt(n))
-    high_point = mean + z * (s / np.sqrt(n))
-    print("двосторонній довірчий інтервал на математичне сподівання: \n"
-          "Нижня межа: " + str(low_point) + "\nВерхня межа: " + str(high_point))
+    low_point = mean - t * (s / np.sqrt(n))
+    high_point = mean + t * (s / np.sqrt(n))
+    return low_point, high_point
+
+def get_xi(percent,size):
+    return scipy.stats.chi2.ppf(percent,size - 1)
+def calculate_and_build_interval_sqrd(sample,percent,size):
+    n = len(sample)
+    x1 = get_xi((1 - percent)/2,size)
+    x2 = get_xi(1-(1-percent)/2,size)
+    s = calculate_varience(sample)
+    low_point = np.sqrt(((n-1)*s) / x1)
+    high_point = np.sqrt(((n-1)*s) / x2)
+    return low_point, high_point
+
+def print_interval_results(sample,percent,size):
+    low_point, high_point = calculate_and_build_interval_expectation(sample,percent,size)
+    print("Двосторонній довірчий інтервал на математичне сподівання: \n"
+          "Нижня межа: " + str(low_point)
+          + "\nВерхня межа: " + str(high_point))
+    low_point, high_point = calculate_and_build_interval_sqrd(sample, percent, size)
+    print("Двосторонній довірчий інтервал на середньоквадратичне відхилення: \n"
+          "Нижня межа: " + str(low_point)
+          + "\nВерхня межа: " + str(high_point))
+
 
 if __name__ == '__main__':
     sample = sps.norm.rvs(loc=0, scale=2.1, size=127)
@@ -112,6 +137,6 @@ if __name__ == '__main__':
     build_paretto(sample)
     build_pie(sample)
     calc_val(sample)
-    calculate_and_build_interval(sample)
+    print_interval_results(sample,0.95 , len(sample))
 
 
