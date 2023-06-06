@@ -2,6 +2,7 @@ import scipy
 import scipy.stats as sps
 import numpy as np
 import matplotlib.pyplot as plt
+import tabulate
 
 
 def build_frequency_polygon(sample):
@@ -128,6 +129,36 @@ def print_interval_results(sample,percent,size):
           "Нижня межа: " + str(low_point)
           + "\nВерхня межа: " + str(high_point))
 
+def build_table_for_investigation():
+    col_names = ["N","Percent","Expectation","SQRD"]
+    data = [];
+    size_arr = [];
+    percent_arr = [];
+
+    size_arr = np.random.randint(10,200,20)
+    percent_arr = np.random.uniform(0.01,0.99,20)
+
+    size_arr.sort()
+    percent_arr.sort()
+
+    size_arr = size_arr[::-1]
+    percent_arr = percent_arr[::-1]
+    for size in size_arr:
+        sample = sps.norm.rvs(loc=0, scale=2.1, size=size)
+        low_exp,high_exp = calculate_and_build_interval_expectation(sample,0.95,size)
+        low_sqr,high_sqr = calculate_and_build_interval_sqrd(sample,0.95,size)
+        data.append([size,0.95,"low: " + str(low_exp) + " high: " + str(high_exp),
+                     "low: " + str(low_sqr) + " high: " + str(high_sqr)])
+    print(tabulate.tabulate(data,col_names));
+
+    data = []
+    for percent in percent_arr:
+        sample = sps.norm.rvs(loc=0, scale=2.1, size=127)
+        low_exp,high_exp = calculate_and_build_interval_expectation(sample,percent,127)
+        low_sqr,high_sqr = calculate_and_build_interval_sqrd(sample,percent,127)
+        data.append([127,percent,"low: " + str(low_exp) + " high: " + str(high_exp),
+                     "low: " + str(low_sqr) + " high: " + str(high_sqr)])
+    print(tabulate.tabulate(data,col_names));
 
 if __name__ == '__main__':
     sample = sps.norm.rvs(loc=0, scale=2.1, size=127)
@@ -138,5 +169,6 @@ if __name__ == '__main__':
     build_pie(sample)
     calc_val(sample)
     print_interval_results(sample,0.95 , len(sample))
+    build_table_for_investigation()
 
 
